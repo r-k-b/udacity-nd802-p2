@@ -56,6 +56,15 @@ __Meets Specifications:__ App includes a build process (such as Grunt
 or Gulp). Assets are minimized and concatenated as appropriate.
 
 
+## Suggestions to Make Your Project Stand Out
+
+* Minimize the amount of information that needs to be cached by caching
+  only what the user access
+
+
+----
+
+
 # links
 
 [Google Transit APIs](https://developers.google.com/transit/)
