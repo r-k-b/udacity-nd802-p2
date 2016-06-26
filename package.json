@@ -1,0 +1,19 @@
+{
+  "name": "@r-k-b/udacity-nd802-p2",
+  "version": "1.0.0",
+  "description": "Udacity Sr Web Developer Nanodegree, Project 2: Public Transportation App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:r-k-b/udacity-nd802-p2.git"
+  },
+  "author": "Robert K. Bell <robert.k.bell@gmail.com> (https://github.com/r-k-b)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/r-k-b/udacity-nd802-p2/issues"
+  },
+  "homepage": "https://github.com/r-k-b/udacity-nd802-p2#readme"
+}
