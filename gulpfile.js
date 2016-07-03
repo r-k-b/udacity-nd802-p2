@@ -1,6 +1,7 @@
 const gulp = require('gulp');
 const runSequence = require('run-sequence');
-const plugins = require('gulp-load-plugins')();
+const plugins = require('gulp-load-plugins')(); // todo: remove this, replace with explicit imports
+const handlebars = require('handlebars');
 const del = require('del');
 const merge = require('ramda').merge;
 const mergeStream = require('merge-stream');
@@ -24,7 +25,6 @@ function createBundle(srcIn) {
   const opts = merge(watchify.args, customOpts);
   const b = watchify(browserify(opts));
 
-  // todo: use `babel-preset-modern` or similar, to minimise code transforms
   b.transform(babelify.configure({}));
 
   b.transform(hbsfy);
@@ -100,7 +100,7 @@ gulp.task('js:browser', () =>
 
 gulp.task('templates:server', () =>
   gulp.src('templates/*.hbs')
-    .pipe(plugins.handlebars())
+    .pipe(plugins.handlebars({ handlebars }))
     .on('error', plugins.util.log.bind(plugins.util))
     .pipe(through.obj((file, enc, callback) => {
       // Don't want the whole lib
