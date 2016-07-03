@@ -1,8 +1,13 @@
-const koa = require('koa');
+import koa from 'koa';
+
 const app = koa();
 
 app.use(function* helloBody() {
   this.body = 'Hello World';
 });
 
-app.listen(3000);
+const start = options => app.listen(options.port);
+
+export default {
+  start,
+};

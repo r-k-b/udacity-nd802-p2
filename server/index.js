@@ -3,8 +3,8 @@ import server from './server';
 
 const argv = minimist(process.argv, {
   default: {
-    'server-port': 8888
-  }
+    'server-port': 8888,
+  },
 });
 
-console.log({argv});
+server.start({ port: argv['server-port'] });
