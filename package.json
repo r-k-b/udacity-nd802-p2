@@ -4,7 +4,11 @@
   "description": "Udacity Sr Web Developer Nanodegree, Project 2: Public Transportation App",
   "main": "index.js",
   "scripts": {
+    "serve": "gulp serve",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "6.2.2"
   },
   "repository": {
     "type": "git",
@@ -15,5 +19,31 @@
   "bugs": {
     "url": "https://github.com/r-k-b/udacity-nd802-p2/issues"
   },
-  "homepage": "https://github.com/r-k-b/udacity-nd802-p2#readme"
+  "homepage": "https://github.com/r-k-b/udacity-nd802-p2#readme",
+  "devDependencies": {
+    "babel-preset-modern": "1.1.0",
+    "babelify": "7.3.0",
+    "browserify": "13.0.1",
+    "del": "2.2.1",
+    "gulp": "3.9.1",
+    "gulp-babel": "6.1.2",
+    "gulp-define-module": "0.1.4",
+    "gulp-develop-server": "0.5.2",
+    "gulp-handlebars": "4.0.0",
+    "gulp-load-plugins": "1.2.4",
+    "gulp-rename": "1.2.2",
+    "gulp-sass": "2.3.2",
+    "gulp-sourcemaps": "1.6.0",
+    "gulp-util": "3.0.7",
+    "handlebars": "4.0.5",
+    "hbsfy": "2.7.0",
+    "merge-stream": "1.0.0",
+    "minimist": "1.2.0",
+    "ramda": "0.21.0",
+    "run-sequence": "1.2.2",
+    "through2": "2.0.1",
+    "vinyl-buffer": "1.0.0",
+    "vinyl-source-stream": "1.1.0",
+    "watchify": "3.7.0"
+  }
 }
