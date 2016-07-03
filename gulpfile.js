@@ -1,5 +1,3 @@
-'use strict';
-
 const gulp = require('gulp');
 const runSequence = require('run-sequence');
 const plugins = require('gulp-load-plugins')();
@@ -15,14 +13,12 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 
 
-function createBundle(src) {
-  if (!src.push) {
-    src = [src];
-  }
+function createBundle(srcIn) {
+  const src = (!srcIn.push) ? [srcIn] : srcIn;
 
   const customOpts = {
     entries: src,
-    debug: true
+    debug: true,
   };
 
   const opts = merge(watchify.args, customOpts);
@@ -41,7 +37,7 @@ const jsBundles = {
   // 'js/polyfills/promise.js': createBundle('./public/js/polyfills/promise.js'),
   // 'js/polyfills/url.js': createBundle('./public/js/polyfills/url.js'),
   'js/main.js': createBundle('./public/js/main/index.js'),
-  'sw.js': createBundle('./public/js/sw/index.js')
+  'sw.js': createBundle('./public/js/sw/index.js'),
 };
 
 
@@ -54,16 +50,16 @@ gulp.task('css', () =>
   gulp.src('public/scss/*.scss')
     .pipe(plugins.sass.sync().on('error', plugins.sass.logError))
     .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.sass({outputStyle: 'compressed'}))
+    .pipe(plugins.sass({ outputStyle: 'compressed' }))
     .pipe(plugins.sourcemaps.write('./'))
     .pipe(gulp.dest('build/public/css/'))
 );
 
 
 function bundle(b, outputPath) {
-  var splitPath = outputPath.split('/');
-  var outputFile = splitPath[splitPath.length - 1];
-  var outputDir = splitPath.slice(0, -1).join('/');
+  const splitPath = outputPath.split('/');
+  const outputFile = splitPath[splitPath.length - 1];
+  const outputDir = splitPath.slice(0, -1).join('/');
 
   return b.bundle()
   // log errors if they happen
@@ -75,11 +71,11 @@ function bundle(b, outputPath) {
     .pipe(buffer())
 
     // optional, remove if you dont want sourcemaps
-    .pipe(plugins.sourcemaps.init({loadMaps: true})) // loads map from browserify file
+    .pipe(plugins.sourcemaps.init({ loadMaps: true })) // loads map from browserify file
 
     // Add transformation tasks to the pipeline here.
     .pipe(plugins.sourcemaps.write('./')) // writes .map file
-    .pipe(gulp.dest('build/public/' + outputDir));
+    .pipe(gulp.dest(`build/public/${outputDir}`));
 }
 
 
@@ -108,12 +104,15 @@ gulp.task('templates:server', () =>
     .on('error', plugins.util.log.bind(plugins.util))
     .pipe(through.obj((file, enc, callback) => {
       // Don't want the whole lib
-      file.defineModuleOptions.require = {Handlebars: 'handlebars/runtime'};
-      callback(null, file);
+      const fileOut = file;
+      fileOut.defineModuleOptions.require = { Handlebars: 'handlebars/runtime' };
+      callback(null, fileOut);
     }))
     .pipe(plugins.defineModule('commonjs'))
-    .pipe(plugins.rename(function (path) {
-      path.extname = '.js';
+    .pipe(plugins.rename(path => {
+      const pathOut = path;
+      pathOut.extname = '.js';
+      return pathOut;
     }))
     .pipe(gulp.dest('build/server/templates'))
 );
@@ -122,7 +121,7 @@ gulp.task('templates:server', () =>
 gulp.task('js:server', () =>
   gulp.src('server/**/*.js')
     .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.babel({})) // todo: use `babel-preset-modern` or similar, to minimise code transforms
+    .pipe(plugins.babel({}))
     .on('error', plugins.util.log.bind(plugins.util))
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('build/server'))
@@ -138,12 +137,12 @@ gulp.task('server', () => {
 
   plugins.developServer.listen({
     path: './index.js',
-    cwd:  './build/server',
-    args: serverArgs
+    cwd: './build/server',
+    args: serverArgs,
   });
 
   gulp.watch([
-    'build/server/**/*.js'
+    'build/server/**/*.js',
   ], plugins.developServer.restart);
 });
 

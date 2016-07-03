@@ -1,4 +1,5 @@
 import minimist from 'minimist';
+import server from './server';
 
 const argv = minimist(process.argv, {
   default: {
