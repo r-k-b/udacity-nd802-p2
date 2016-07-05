@@ -2,7 +2,8 @@
 
 ## Project 2: [Public Transportation App](https://classroom.udacity.com/nanodegrees/nd802/parts/8021345403/modules/550593026975462/lessons/5505930269239847/concepts/57997297480923)
 
-Prepare for this project with [JavaScript Promises](https://classroom.udacity.com/courses/ud898) and [Building Offline-First Apps.](https://www.udacity.com/course/offline-web-applications--ud899)
+Prepare for this project with [JavaScript Promises](https://classroom.udacity.com/courses/ud898)
+and [Building Offline-First Apps.](https://www.udacity.com/course/offline-web-applications--ud899)
 
 
 ## Viewing this project
