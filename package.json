@@ -7,7 +7,9 @@
     "serve": "gulp serve",
     "test": "echo \"Error: no test specified\" && exit 1",
     "node-debug": "node-debug",
-    "node-inspector": "node-inspector"
+    "node-inspector": "node-inspector",
+    "gtfs2json": "node lib/gtfs2json.js",
+    "uploadToFirebase": "node lib/upload_originals_to_firebase.js"
   },
   "engines": {
     "node": "6.2.2"
@@ -30,6 +32,7 @@
     "data.either": "1.4.0",
     "data.maybe": "1.2.2",
     "data.task": "3.1.0",
+    "debug": "2.2.0",
     "del": "2.2.1",
     "dotenv": "2.0.0",
     "eslint": "2.13.1",
