@@ -70,3 +70,11 @@ or Gulp). Assets are minimized and concatenated as appropriate.
 
 [Google Transit APIs](https://developers.google.com/transit/)
 
+
+# mysql setup
+
+```
+cd ./mysql-docker
+sudo docker build -t mysqlgtfs .
+sudo docker sudo docker run --name grabel -e MYSQL_ROOT_PASSWORD=sooperSECR3Tpassw0rd -d mysqlgtfs
+```
