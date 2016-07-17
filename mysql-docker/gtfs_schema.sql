@@ -99,11 +99,11 @@ CREATE TABLE `notes` (
 );
 
 CREATE TABLE `stops` (
-  id                  INT(12)        NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  transit_system      NVARCHAR(50)   NOT NULL,
+  id                  INT(12)         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  transit_system      NVARCHAR(50)    NOT NULL,
   stop_id             NVARCHAR(255),
   stop_code           NVARCHAR(50),
-  stop_name           NVARCHAR(255)  NOT NULL,
+  stop_name           NVARCHAR(255)   NOT NULL,
   stop_desc           NVARCHAR(255),
   stop_lat            DECIMAL(28, 14) NOT NULL,
   stop_lon            DECIMAL(28, 14) NOT NULL,
@@ -142,6 +142,7 @@ CREATE TABLE `trips` (
   KEY `service_id` (service_id),
   KEY `direction_id` (direction_id),
   KEY `block_id` (block_id),
+  KEY `trip_id` (trip_id),
   KEY `shape_id` (shape_id)
 );
 
@@ -207,3 +208,139 @@ CREATE TABLE `frequencies` (
   KEY `trip_id` (trip_id)
 );
 
+# ---------------------------------------------------
+# derived(?) tables
+# todo: either load the gtfs data before creating the tables below, or set up (cascades|triggers|???)
+
+CREATE TABLE routes__train (
+  id               INT(12)       NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  transit_system   NVARCHAR(50)  NOT NULL,
+  route_id         NVARCHAR(100),
+  agency_id        NVARCHAR(50),
+  route_short_name NVARCHAR(50)  NOT NULL,
+  route_long_name  NVARCHAR(255) NOT NULL,
+  route_type       NVARCHAR(2)   NOT NULL,
+  route_text_color NVARCHAR(255),
+  route_color      NVARCHAR(255),
+  route_url        NVARCHAR(255),
+  route_desc       NVARCHAR(255),
+  KEY `agency_id` (agency_id),
+  KEY `route_type` (route_type)
+) AS
+  SELECT *
+  FROM routes
+  WHERE route_type = 2;
+
+CREATE TABLE trips__train (
+  id                    INT(12)       NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  transit_system        NVARCHAR(50)  NOT NULL,
+  route_id              NVARCHAR(100) NOT NULL,
+  service_id            NVARCHAR(100) NOT NULL,
+  trip_id               NVARCHAR(255),
+  trip_headsign         NVARCHAR(255),
+  trip_short_name       NVARCHAR(255),
+  direction_id          TINYINT(1), #0 for one direction, 1 for another.
+  block_id              NVARCHAR(11),
+  shape_id              NVARCHAR(40),
+  wheelchair_accessible TINYINT(1), #0 for no information, 1 for at
+  # least one rider accommodated on wheel chair, 2 for no riders
+  # accommodated.
+  bikes_allowed         TINYINT(1), #0 for no information, 1 for at least
+  # one bicycle accommodated, 2 for no bicycles accommodated
+  trip_note_id          NVARCHAR(100), # TfNSW extension
+  KEY `service_id` (service_id),
+  KEY `direction_id` (direction_id),
+  KEY `block_id` (block_id),
+  KEY `trip_id` (trip_id),
+  KEY `shape_id` (shape_id)
+) AS
+  SELECT *
+  FROM trips
+  WHERE exists(
+      SELECT route_id
+      FROM routes__train
+      WHERE routes__train.route_id = trips.route_id
+  );
+
+CREATE TABLE stop_times__train (
+  id                     INT(12)       NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  transit_system         NVARCHAR(50)  NOT NULL,
+  trip_id                NVARCHAR(100) NOT NULL,
+  arrival_time           NVARCHAR(8)   NOT NULL,
+  arrival_time_seconds   INT(100),
+  departure_time         NVARCHAR(8)   NOT NULL,
+  departure_time_seconds INT(100),
+  stop_id                NVARCHAR(100) NOT NULL,
+  stop_sequence          NVARCHAR(100) NOT NULL,
+  stop_headsign          NVARCHAR(50),
+  pickup_type            NVARCHAR(2),
+  drop_off_type          NVARCHAR(2),
+  shape_dist_traveled    NVARCHAR(50),
+  stop_note_id           NVARCHAR(100), # TfNSW extension
+  KEY `trip_id` (trip_id),
+  KEY `arrival_time_seconds` (arrival_time_seconds),
+  KEY `departure_time_seconds` (departure_time_seconds),
+  KEY `stop_id` (stop_id),
+  KEY `stop_sequence` (stop_sequence),
+  KEY `pickup_type` (pickup_type),
+  KEY `drop_off_type` (drop_off_type)
+) AS
+  SELECT *
+  FROM stop_times
+  WHERE exists(
+      SELECT trip_id
+      FROM trips__train
+      WHERE trips__train.trip_id = stop_times.trip_id
+  );
+
+CREATE TABLE stops__train_platforms (
+  id                  INT(12)         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  transit_system      NVARCHAR(50)    NOT NULL,
+  stop_id             NVARCHAR(255),
+  stop_code           NVARCHAR(50),
+  stop_name           NVARCHAR(255)   NOT NULL,
+  stop_desc           NVARCHAR(255),
+  stop_lat            DECIMAL(28, 14) NOT NULL,
+  stop_lon            DECIMAL(28, 14) NOT NULL,
+  zone_id             NVARCHAR(255),
+  stop_url            NVARCHAR(255),
+  location_type       NVARCHAR(2), # TfNSW extension
+  parent_station      NVARCHAR(100), # TfNSW extension
+  platform_code       NVARCHAR(50), # TfNSW extension
+  stop_timezone       NVARCHAR(50),
+  wheelchair_boarding TINYINT(1), # TfNSW extension
+  KEY `zone_id` (zone_id),
+  KEY `stop_lat` (stop_lat),
+  KEY `stop_lon` (stop_lon),
+  KEY `location_type` (location_type),
+  KEY `parent_station` (parent_station)
+) AS
+  SELECT *
+  FROM stops
+  WHERE exists(
+      SELECT stop_id
+      FROM stop_times__train
+      WHERE stop_times__train.stop_id = stops.stop_id
+  );
+
+CREATE TABLE stops__train_stations (
+  id           INT(12)         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  station_id   NVARCHAR(100)   NOT NULL,
+  station_name NVARCHAR(255)   NOT NULL,
+  station_lat  DECIMAL(28, 14) NOT NULL,
+  station_lon  DECIMAL(28, 14) NOT NULL,
+  KEY `station_lat` (station_lat),
+  KEY `station_lon` (station_lon),
+  KEY `station_id` (station_id)
+) SELECT
+    parent_station                         AS station_id,
+    replace(stop_name, ', Platform 1', '') AS station_name,
+    stop_lat                               AS station_lat,
+    stop_lon                               AS station_lon
+  FROM stops__train_platforms
+  WHERE
+    platform_code IS NULL
+    OR platform_code = ''
+    OR platform_code = '1'
+  GROUP BY parent_station, stop_name, stop_lat, stop_lon
+  ORDER BY parent_station

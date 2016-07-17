@@ -9,7 +9,7 @@
 - [✓] get data from gtfs api / file (?)
   - [✓] convert gtfs txt → json
   - [ ] optimize data structure?
-  - [ ] upload json to db (firebase?)
+  - [✓] upload data to db (csv → mysql)
 - [ ] allow users to select a departure and arrival train station
   - [ ] get list of train stations
     - [ ] get list of train routes (`routes where route_type=2`)
