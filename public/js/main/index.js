@@ -1,3 +1,5 @@
-const f = x => console.info(x);
+import { map } from 'ramda';
+import ToastsView from './views/Toasts';
 
-f('hey.');
+const stationDataReq = fetch('/gtfs-data/stations.json');
+

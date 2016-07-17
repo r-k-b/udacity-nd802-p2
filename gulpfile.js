@@ -83,18 +83,17 @@ gulp.task('copy', () =>
   mergeStream(
     gulp.src('public/imgs/**/*')
       .pipe(gulp.dest('build/public/imgs/')),
-    gulp.src('public/avatars/**/*')
-      .pipe(gulp.dest('build/public/avatars/')),
-    gulp.src('server/*.txt')
-      .pipe(gulp.dest('build/server/')),
     gulp.src('public/*.json')
-      .pipe(gulp.dest('build/public/'))
+      .pipe(gulp.dest('build/public/')),
+    gulp.src('public/gtfs-data/*')
+      .pipe(gulp.dest('build/public/gtfs-data/'))
   )
 );
 
+const createBundleFromKey = key => bundle(jsBundles[key], key);
 
 gulp.task('js:browser', () =>
-  mergeStream(...Object.keys(jsBundles).map(key => bundle(jsBundles[key], key)))
+  mergeStream(...Object.keys(jsBundles).map(createBundleFromKey))
 );
 
 
@@ -161,7 +160,7 @@ gulp.task('watch', () => {
     ['js:server']
   );
   gulp.watch(
-    ['public/imgs/**/*', 'public/avatars/**/*', 'server/*.txt', 'public/*.json'],
+    ['public/imgs/**/*', 'public/gtfs-data/**/*', 'server/*.txt', 'public/*.json'],
     ['copy']
   );
 

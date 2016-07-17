@@ -1,0 +1,29 @@
+<section>
+    <div class="station_choosers">
+        <div class="station_chooser">
+            <div class="station_chooser__departure">
+                <label for="station_departure">
+                    Departing from...
+                </label>
+                <!-- TODO: replace these `<select>`s with something better for UX -->
+                <select name="station_departure" id="station_departure" data-station-selector="departure">
+                    <option value="" disabled selected>Please select...</option>
+                    {{{ stationOptions_departure }}}
+                </select>
+            </div>
+
+            <div class="station_chooser__arrival">
+                <label for="station_arrival">
+                    Arriving at...
+                </label>
+                <select name="station_arrival" id="station_arrival" data-station-selector="arrival">
+                    <option value="" disabled selected>Please select...</option>
+                    {{{ stationOptions_arrival }}}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="available_trips" data-trips-container>
+        <em>Please select a departure station and an arrival station above.</em>
+    </div>
+</section>

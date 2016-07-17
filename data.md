@@ -76,3 +76,7 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (route_id,service_id,trip_id,shape_id,trip_headsign,direction_id,block_id,wheelchair_accessible);
 ```
+
+# `public/stations.json`
+
+Dumped from table `stops__train_stations`, by `lib/mysql2json.js`

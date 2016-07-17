@@ -8,7 +8,8 @@ and [Building Offline-First Apps.](https://www.udacity.com/course/offline-web-ap
 
 ## Viewing this project
 
-Run `npm start && npm serve`
+* Run `npm start`
+* Open [`localhost:8888`](http://localhost:8888/)
 
 
 ## Evaluation
