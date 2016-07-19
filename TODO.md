@@ -21,6 +21,7 @@
     - [ ] find routes between given stations (on selector change)
       - [ ] what will that data look like?
     - [ ] display matching routes
+- [ ] add autoprefixer to css pipeline
 - [ ] use cycle.js?
 - [ ] use proper caching (`max-age`, invalidation, etc)
 - [ ] use data compression

@@ -46,6 +46,7 @@ gulp.task('clean', done =>
 );
 
 
+// TODO: add autoprefixer to pipeline
 gulp.task('css', () =>
   gulp.src('public/scss/*.scss')
     .pipe(plugins.sass.sync().on('error', plugins.sass.logError))

@@ -49,16 +49,24 @@ Toast.prototype.hide = function hideToast() {
 };
 
 export default function Toasts(appendToEl) {
+  if (!(this instanceof Toasts)) {
+    return new Toasts(appendToEl);
+  }
+
   this._container = parseHTML('<div class="toasts"></div>').firstChild;
   appendToEl.appendChild(this._container);
 }
 
-// show a message to the user eg:
-// toasts.show("Do you wish to continue?", {
-//   buttons: ['yes', 'no']
-// })
-// Returns a toast.
-// noinspection JSUnusedGlobalSymbols
+/**
+ show a message to the user eg:
+
+    toasts.show("Do you wish to continue?", {
+      buttons: ['yes', 'no']
+    })
+
+ Returns a toast.
+ noinspection JSUnusedGlobalSymbols
+ */
 Toasts.prototype.show = function showToast(message, optsIn) {
   const opts = merge(optsIn, {
     duration: 0,

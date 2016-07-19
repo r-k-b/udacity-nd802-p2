@@ -5,7 +5,7 @@ import ToastsView from './views/Toasts';
 
 const db = {
   name: 'bondord',
-  store: 'screcell',
+  store: 'stations',
 };
 
 function openDatabase() {
@@ -19,30 +19,21 @@ function openDatabase() {
     const store = upgradeDb.createObjectStore(db.store, {
       keyPath: 'id',
     });
-    store.createIndex('by-date', 'time');
+    store.createIndex('');
   };
 
   return idb.open(db.name, 1, onUpgrade);
 }
 
 export default function IndexController(container) {
+  if (!(this instanceof IndexController)) {
+    return new IndexController(container);
+  }
+
   this._container = container;
   this._toastsView = new ToastsView(this._container);
-  this._lostConnectionToast = null;
   this._dbPromise = openDatabase();
   this._registerServiceWorker();
-  this._cleanImageCache();
-
-  const indexController = this;
-
-  setInterval(() => {
-    indexController._cleanImageCache();
-  }, 1000 * 60 * 5);
-
-  this._showCachedMessages()
-    .then(() => {
-      indexController._openSocket();
-    });
 }
 
 IndexController.prototype._registerServiceWorker = function registerIndexCSW() {
@@ -81,16 +72,15 @@ IndexController.prototype._registerServiceWorker = function registerIndexCSW() {
   });
 };
 
-IndexController.prototype._trackInstalling = function (worker) {
-  const indexController = this;
+IndexController.prototype._trackInstalling = function _trackInstalling(worker) {
   worker.addEventListener('statechange', () => {
     if (worker.state === 'installed') {
-      indexController._updateReady(worker);
+      this._updateReady(worker);
     }
   });
 };
 
-IndexController.prototype._updateReady = function (worker) {
+IndexController.prototype._updateReady = function _updateReady(worker) {
   const toast = this._toastsView.show('New version available', {
     buttons: ['refresh', 'dismiss'],
   });
@@ -99,75 +89,4 @@ IndexController.prototype._updateReady = function (worker) {
     if (answer !== 'refresh') return;
     worker.postMessage({ action: 'skipWaiting' });
   });
-};
-
-// open a connection to the server for live updates
-IndexController.prototype._openSocket = function () {
-  const indexController = this;
-  const latestPostDate = this._postsView.getLatestPostDate();
-
-  // create a url pointing to /updates with the ws protocol
-  const socketUrl = new URL('/updates', window.location);
-  socketUrl.protocol = 'ws';
-
-  if (latestPostDate) {
-    socketUrl.search = `since=${latestPostDate.valueOf()}`;
-  }
-
-  // this is a little hack for the settings page's tests,
-  // it isn't needed for Wittr
-  socketUrl.search += `&${location.search.slice(1)}`;
-
-  const ws = new WebSocket(socketUrl.href);
-
-  // add listeners
-  ws.addEventListener('open', () => {
-    if (indexController._lostConnectionToast) {
-      indexController._lostConnectionToast.hide();
-    }
-  });
-
-  ws.addEventListener('message', (event) => {
-    requestAnimationFrame(() => {
-      indexController._onSocketMessage(event.data);
-    });
-  });
-
-  ws.addEventListener('close', () => {
-    // tell the user
-    if (!indexController._lostConnectionToast) {
-      indexController._lostConnectionToast = indexController._toastsView.show('Unable to connect. Retrying…');
-    }
-
-    // try and reconnect in 5 seconds
-    setTimeout(() => {
-      indexController._openSocket();
-    }, 5000);
-  });
-};
-
-// called when the web socket sends message data
-IndexController.prototype._onSocketMessage = function (data) {
-  const messages = JSON.parse(data);
-
-  this._dbPromise.then(function (db) {
-    if (!db) return;
-
-    var tx = db.transaction('wittrs', 'readwrite');
-    var store = tx.objectStore('wittrs');
-    messages.forEach(function (message) {
-      store.put(message);
-    });
-
-    // limit store to 30 items
-    store.index('by-date').openCursor(null, "prev").then(function (cursor) {
-      return cursor.advance(30);
-    }).then(function deleteRest(cursor) {
-      if (!cursor) return;
-      cursor.delete();
-      return cursor.continue().then(deleteRest);
-    });
-  });
-
-  this._postsView.addPosts(messages);
 };
