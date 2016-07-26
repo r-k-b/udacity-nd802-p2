@@ -285,13 +285,18 @@ CREATE TABLE stop_times__train (
   KEY `pickup_type` (pickup_type),
   KEY `drop_off_type` (drop_off_type)
 ) AS
-  SELECT *
+  SELECT
+    stop_times.*,
+    stops.parent_station
   FROM stop_times
+    INNER JOIN stops
+      ON (stop_times.stop_id = stops.stop_id)
   WHERE exists(
       SELECT trip_id
       FROM trips__train
       WHERE trips__train.trip_id = stop_times.trip_id
-  );
+  )
+  ORDER BY trip_id, cast(stop_sequence AS UNSIGNED) ASC;
 
 CREATE TABLE stops__train_platforms (
   id                  INT(12)         NOT NULL PRIMARY KEY AUTO_INCREMENT,
